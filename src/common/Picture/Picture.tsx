@@ -9,21 +9,22 @@ interface PictureProps {
   height?: number;
 }
 
-const Picture: React.FC<any> = ({ src, srcSet, alt, width, height }) => (
+const Picture: React.FC<any> = ({ src, srcSet, alt, width, height, style }) => (
   <div
     style={{
       position: 'relative',
     }}
   >
     <Image
-      // width={width}
-      // height={height}
+      width={width}
+      height={height}
       //  placeholder="blur"
       // srcSet={srcSet}
       // srcSet
       // fill
       // res
       // layout="responsive"
+      style={style}
       loader={() => src}
       src={src}
       alt={alt ?? 'picture'}

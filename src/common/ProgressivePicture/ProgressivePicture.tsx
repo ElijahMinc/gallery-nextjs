@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { SkeletonProgress } from '../SkeletonProgress';
-import { Box } from '@mui/material';
 
 interface ProgressivePictureProps
   extends React.DetailedHTMLProps<
@@ -37,7 +35,7 @@ export const ProgressivePicture: React.FC<ProgressivePictureProps> = ({
         }}
         alt={alt}
       />
-      {isLoading && <SkeletonProgress width="100%" height="100%" />}
+      {isLoading && <div>loading</div>}
     </>
   );
 };
