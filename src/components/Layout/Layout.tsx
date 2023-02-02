@@ -20,10 +20,16 @@ const Container = styled.div({
 
 export const Layout: FC<LayoutProps> = ({ children }) => {
   return (
-    <>
-      <Container className={roboto.className}>
+    <div className={roboto.className}>
+      <Container
+        style={{
+          maxWidth: '1090px',
+          margin: '0 auto',
+          padding: '0 10px',
+        }}
+      >
         <main>{children}</main>
       </Container>
-    </>
+    </div>
   );
 };

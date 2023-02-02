@@ -1,14 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { HeadContent } from '@/components/Head';
 import { metaElementsForHomePage } from '@/config/meta/metaHomePage';
 import { ImageService } from '@/services';
 import { useQuery } from 'react-query';
-import { Loader, Picture } from '@/common';
 import { v4 as uuidv4 } from 'uuid';
-import { ProgressivePicture } from '@/common/ProgressivePicture/ProgressivePicture';
-import { VirtuosoGrid } from 'react-virtuoso';
 import styled from 'styled-components';
-import AutoSizer from 'react-virtualized-auto-sizer';
+import { OverviewListImage } from '@/components/OverviewList/OverviewListImage';
 
 const ItemContainer = styled.div`
   padding: 0.5rem;
@@ -44,7 +41,7 @@ const ListContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const Footer = () => {
+export const Loader = () => {
   return (
     <div className="lds-roller">
       <div></div>
@@ -60,6 +57,8 @@ const Footer = () => {
 };
 
 const Home = () => {
+  const containerRef = useRef<any>();
+  const [isEndList, setEndList] = useState(false);
   const [page, setPage] = useState(1);
   const [images, setImages] = useState<any[]>([]);
 
@@ -71,60 +70,39 @@ const Home = () => {
       }),
     {
       onSuccess: (data) => setImages((prev) => prev.concat(data)),
-      select: (data) =>
-        data.map((imageData) => ({ ...imageData, handleId: uuidv4() })),
+      // select: (data) =>
+      //   data.map((imageData) => ({ ...imageData, handleId: uuidv4() })),
+      select: (data) => {
+        const ROW_HEIGHTS = [50, 75, 100, 150];
+
+        return data.map((imageData) => ({
+          ...imageData,
+          size: ROW_HEIGHTS[Math.floor(Math.random() * ROW_HEIGHTS.length)],
+          handleId: uuidv4(),
+        }));
+      },
     }
   );
 
-  const nextPage = () => {
-    setTimeout(() => {
-      setPage((prev) => (prev += 1));
-    }, 2000);
+  const nextPage = async () => {
+    const promise = new Promise<void>((resolve) => {
+      setTimeout(() => {
+        setPage((prev) => (prev += 1));
+        resolve();
+      }, 2000);
+    });
+
+    return promise;
   };
 
   return (
     <>
       <HeadContent title="Title" metaElements={metaElementsForHomePage} />
-      <div
-        style={{
-          height: '100vh',
-          overflow: 'hidden',
-        }}
-      >
-        <AutoSizer>
-          {({ height, width }) => (
-            <VirtuosoGrid
-              style={{ height, width }}
-              totalCount={images.length}
-              data={images}
-              overscan={200}
-              endReached={nextPage}
-              components={{
-                Item: ItemContainer,
-                List: ListContainer,
-                Footer: Footer,
-              }}
-              itemContent={(index, image) => {
-                // const image = images[index];
-                console.log('image', image);
-                return (
-                  <ItemWrapper>
-                    <Picture
-                      width={200}
-                      height={200}
-                      style={{
-                        borderTopRightRadius: '20px',
-                        borderBottomLeftRadius: '20px',
-                      }}
-                      src={image.urls.small}
-                    />
-                  </ItemWrapper>
-                );
-              }}
-            />
-          )}
-        </AutoSizer>
-      </div>
+      {/* <div id="scroll-wrapper"  ref={containerRef}> */}
+      {/* <div className={"artwork"} />
+        <div className={"header-sticky"}>List of profiles</div> */}
+      <OverviewListImage loadMore={nextPage} items={images} />
+      {/* </div> */}
     </>
   );
 };

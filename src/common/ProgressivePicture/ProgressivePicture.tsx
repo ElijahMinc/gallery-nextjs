@@ -18,7 +18,6 @@ export const ProgressivePicture: React.FC<ProgressivePictureProps> = ({
   const [isLoading, setLoading] = useState(true);
 
   const handleOnLoadPicture = () => {
-    console.log('here');
     setLoading(false);
   };
 
