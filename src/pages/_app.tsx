@@ -1,25 +1,30 @@
 import { Layout } from '@/components/Layout';
 import type { AppProps } from 'next/app';
 import '@/styles/globals.css';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { createGlobalStyle } from 'styled-components';
+import { QueryClient, QueryClientProvider, Hydrate } from 'react-query';
+import { useState } from 'react';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
+export const QueryClientWithConfig = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
     },
-  },
-});
-
-// Style
+  });
 
 const App = ({ Component, pageProps }: AppProps) => {
+  const [queryClient] = useState(QueryClientWithConfig);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      <Hydrate state={pageProps.dehydratedState}>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </Hydrate>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
 };

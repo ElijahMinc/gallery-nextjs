@@ -1,4 +1,4 @@
-import { useRef, useState, forwardRef, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import createCellPositioner from '@/utils/createCellPositioner';
 import {
   CellMeasurer,
@@ -17,6 +17,7 @@ import { Picture } from '@/common';
 interface OverviewListImageProps {
   items: any[];
   loadMore: () => Promise<void>;
+  onSelect: (index: number) => void;
 }
 
 const state = {
@@ -36,6 +37,7 @@ const _cache = new CellMeasurerCache({
 export const OverviewListImage: React.FC<OverviewListImageProps> = ({
   items,
   loadMore,
+  onSelect,
 }) => {
   const [isLoading, setLoading] = useState(false);
   const masonryRef = useRef<Masonry>(null);
@@ -74,7 +76,8 @@ export const OverviewListImage: React.FC<OverviewListImageProps> = ({
   const _cellRenderer = ({ index, key, parent, style }: MasonryCellProps) => {
     const { columnWidth } = state;
 
-    const datum = items[index % items.length];
+    const image = items[index % items.length];
+
     return (
       <CellMeasurer cache={_cache} index={index} key={key} parent={parent}>
         {({ registerChild }: any) => (
@@ -87,17 +90,23 @@ export const OverviewListImage: React.FC<OverviewListImageProps> = ({
             }}
           >
             <div>
+              <input
+                type="checkbox"
+                onChange={() => onSelect(index)}
+                checked={image.isSelected}
+              />
               <Picture
                 style={{
                   borderRadius: '0.5rem',
-                  height: datum.size * 3,
+                  height: image.size * 3,
                   marginBottom: '0.5rem',
                   width: '100%',
                   objectFit: 'cover',
                 }}
                 width={columnWidth}
-                height={datum.size * 3}
-                src={datum.urls.small}
+                height={image.size * 3}
+                src={image.urls.small}
+                alt="picture"
               />
             </div>
           </div>
@@ -129,7 +138,7 @@ export const OverviewListImage: React.FC<OverviewListImageProps> = ({
         loadMoreRows={loadMoreRow}
         rowCount={hasMore ? items.length + 1 : items.length}
       >
-        {({ registerChild, onRowsRendered }) => (
+        {({ onRowsRendered }) => (
           <WindowScroller>
             {({ height, isScrolling, registerChild, scrollTop }: any) => (
               <AutoSizer
